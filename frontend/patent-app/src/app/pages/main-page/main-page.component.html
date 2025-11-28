@@ -1,0 +1,45 @@
+<div class="wrapper">
+  <label tuiInputFiles>
+    <input
+      tuiInputFiles
+      accept="application/pdf"
+      [multiple]="false"
+      [formControl]="control"
+      (reject)="onReject($event)"
+    />
+  </label>
+
+  @if (file$ | async; as file) {
+    <tui-files>
+      <tui-file
+        tuiItem
+        [file]="file"
+      ></tui-file>
+    </tui-files>
+
+    <button
+      tuiButton
+      type="button"
+      [disabled]="isUploading()"
+      (click)="uploadFile()"
+      class="upload-button"
+    >
+      {{ isUploading() ? 'Uploading...' : 'Upload Patent' }}
+    </button>
+  }
+
+  @if (uploadProgress() > 0 && uploadProgress() < 100) {
+    <div class="progress">
+      <div class="progress-bar" [style.width.%]="uploadProgress()"></div>
+      <span>{{ uploadProgress() }}%</span>
+    </div>
+  }
+
+  @if (uploadStatus()) {
+    <div class="status" [class.error]="uploadStatus().includes('Error')">
+      {{ uploadStatus() }}
+    </div>
+  }
+
+  
+</div>
