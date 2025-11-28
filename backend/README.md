@@ -6,6 +6,7 @@ A simple FastAPI application for the Patent Management System.
 
 1. Activate the virtual environment:
 ```bash
+cd backend
 source .venv/bin/activate
 ```
 
@@ -16,20 +17,25 @@ pip install -r requirements.txt
 
 ## Running the Application
 
-Start the development server:
+### Using FastAPI CLI (Recommended)
+
+Start the development server with auto-reload:
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+fastapi dev src/main.py
+```
+
+### Alternative: Using Uvicorn directly
+
+```bash
+uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 The API will be available at:
-- API: http://localhost:8000
-- Interactive API docs (Swagger): http://localhost:8000/docs
-- Alternative API docs (ReDoc): http://localhost:8000/redoc
+- **API**: http://localhost:8000
+- **Interactive API docs (Swagger)**: http://localhost:8000/docs
+- **Alternative API docs (ReDoc)**: http://localhost:8000/redoc
 
 ## Endpoints
 
-- `GET /` - Root endpoint
-- `GET /health` - Health check
-- `GET /api/patents` - Get list of patents
-- `GET /api/patents/{patent_id}` - Get a specific patent by ID
+- `GET /` - Root endpoint (returns "Hello World")
 
