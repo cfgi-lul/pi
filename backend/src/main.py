@@ -4,8 +4,8 @@ app = FastAPI(
     title="Patent API",
     description="API for patent management and processing",
     version="1.0.0",
-    docs_url="/docs",  # Swagger UI available at /docs
-    redoc_url="/redoc"  # ReDoc available at /redoc
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
 
@@ -14,7 +14,7 @@ async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/patents")
+@app.post("/patent")
 async def upload_patent(file: UploadFile = File(...)):
     """
     Upload a PDF file for patent processing.
