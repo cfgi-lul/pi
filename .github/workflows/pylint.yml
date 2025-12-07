@@ -27,8 +27,10 @@ jobs:
     - name: Analysing the code with pylint
       working-directory: ./backend
       run: |
+        shopt -s globstar nullglob
         pylint src/**/*.py
     - name: Checking PEP 8 style compliance
       working-directory: ./backend
       run: |
+        shopt -s globstar nullglob
         pycodestyle src/**/*.py
