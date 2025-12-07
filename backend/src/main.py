@@ -42,4 +42,7 @@ async def upload_patent(file: UploadFile = File(...)):
         return {"error": "File must be a PDF"}
 
     # Return hardcoded string
-    return {"message": "Patent file received successfully", "status": "processed"}
+    return {
+        "message": "Patent file received successfully",
+        "status": "processed"
+    }
