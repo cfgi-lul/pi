@@ -1,45 +1,103 @@
 <div class="wrapper">
-  <label tuiInputFiles>
-    <input
-      tuiInputFiles
-      accept="application/pdf"
-      [multiple]="false"
-      [formControl]="control"
-      (reject)="onReject($event)"
-    />
-  </label>
+  <div class="upload-container">
+    <label tuiInputFiles>
+      <input
+        tuiInputFiles
+        accept="application/pdf"
+        [multiple]="false"
+        [formControl]="control"
+        (reject)="onReject($event)"
+      />
+    </label>
 
-  @if (file$ | async; as file) {
-    <tui-files>
-      <tui-file
-        tuiItem
-        [file]="file"
-      ></tui-file>
-    </tui-files>
+    @if (file$ | async; as file) {
+      <tui-files>
+        <tui-file
+          tuiItem
+          [file]="file"
+        ></tui-file>
+      </tui-files>
 
-    <button
-      tuiButton
-      type="button"
-      [disabled]="isUploading()"
-      (click)="uploadFile()"
-      class="upload-button"
+      <button
+        tuiButton
+        type="button"
+        [disabled]="isUploading()"
+        (click)="uploadFile()"
+        class="upload-button"
+      >
+        {{ isUploading() ? 'Uploading...' : 'Upload Patent' }}
+      </button>
+    }
+
+    @if (uploadProgress() > 0 && uploadProgress() < 100) {
+      <div class="progress">
+        <div class="progress-bar" [style.width.%]="uploadProgress()"></div>
+        <span>{{ uploadProgress() }}%</span>
+      </div>
+    }
+
+    @if (uploadStatus()) {
+      <div class="status" [class.error]="uploadStatus().includes('Error')">
+        {{ uploadStatus() }}
+      </div>
+    }
+  </div>
+
+  @if (tableData().length > 0) {
+    <tui-scrollbar
+      waIntersectionRoot
+      class="scrollbar"
+      [hidden]="true"
     >
-      {{ isUploading() ? 'Uploading...' : 'Upload Patent' }}
-    </button>
+      <table
+        size="l"
+        tuiTable
+        class="table"
+        [columns]="columns"
+      >
+        <thead tuiThead>
+          <tr tuiThGroup>
+            <th
+              *tuiHead="'fileName'"
+              tuiTh
+              [sticky]="true"
+            >
+              File Name
+            </th>
+            @for (prop of propertyColumns(); track prop) {
+              <th
+                *tuiHead="prop"
+                tuiTh
+              >
+                {{ prop }}
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody
+          tuiTbody
+          [data]="tableData()"
+        >
+          @for (row of tableData(); track row.fileName) {
+            <tr tuiTr>
+              <td
+                *tuiCell="'fileName'"
+                tuiTd
+              >
+                {{ row.fileName }}
+              </td>
+              @for (prop of propertyColumns(); track prop) {
+                <td
+                  *tuiCell="prop"
+                  tuiTd
+                >
+                  {{ row[prop] || '-' }}
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </tui-scrollbar>
   }
-
-  @if (uploadProgress() > 0 && uploadProgress() < 100) {
-    <div class="progress">
-      <div class="progress-bar" [style.width.%]="uploadProgress()"></div>
-      <span>{{ uploadProgress() }}%</span>
-    </div>
-  }
-
-  @if (uploadStatus()) {
-    <div class="status" [class.error]="uploadStatus().includes('Error')">
-      {{ uploadStatus() }}
-    </div>
-  }
-
-  
 </div>
