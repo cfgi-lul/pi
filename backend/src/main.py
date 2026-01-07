@@ -1,6 +1,7 @@
 """Patent API module for patent management and processing."""
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from utils.pdf_text_extractor import extract_text_from_pdf, is_pdf_file
 
 app = FastAPI(
     title="Patent API",
@@ -29,20 +30,31 @@ async def root():
 @app.post("/patent")
 async def upload_patent(file: UploadFile = File(...)):
     """
-    Upload a PDF file for patent processing.
+    Загрузка PDF файла для обработки патента.
 
-    Args:
-        file: PDF file to upload
+    Аргументы:
+        file: PDF файл для загрузки
 
-    Returns:
-        Hardcoded response string
+    Возвращает:
+        Результат обработки PDF
     """
-    # Validate file type
-    if file.content_type != "application/pdf":
-        return {"error": "File must be a PDF"}
+    # Сохранение загруженного файла временно
+    file_location = f"/tmp/{file.filename}"
+    with open(file_location, "wb") as f:
+        f.write(await file.read())
 
-    # Return hardcoded string
-    return {
-        "message": "Patent file received successfully",
-        "status": "processed"
-    }
+    # Проверка, является ли файл PDF
+    if not is_pdf_file(file_location):
+        return {"error": "Неверный PDF файл"}
+
+    # Извлечение текста из PDF
+    try:
+        extracted_text, metadata = extract_text_from_pdf(file_location)
+        return {
+            "message": "Файл патента успешно получен и обработан",
+            "status": "processed",
+            "extracted_text": extracted_text,
+            "metadata": metadata
+        }
+    except Exception as e:
+        return {"error": f"Произошла ошибка при обработке PDF: {str(e)}"}
