@@ -1,3 +1,4 @@
+"""Patent API module for patent management and processing."""
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,7 +7,7 @@ app = FastAPI(
     description="API for patent management and processing",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Configure CORS to allow requests from Angular frontend
@@ -21,6 +22,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
+    """Root endpoint that returns a welcome message."""
     return {"message": "Hello World"}
 
 
@@ -28,16 +30,19 @@ async def root():
 async def upload_patent(file: UploadFile = File(...)):
     """
     Upload a PDF file for patent processing.
-    
+
     Args:
         file: PDF file to upload
-        
+
     Returns:
         Hardcoded response string
     """
     # Validate file type
     if file.content_type != "application/pdf":
         return {"error": "File must be a PDF"}
-    
+
     # Return hardcoded string
-    return {"message": "Patent file received successfully", "status": "processed"}
+    return {
+        "message": "Patent file received successfully",
+        "status": "processed"
+    }
