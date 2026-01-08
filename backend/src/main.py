@@ -75,7 +75,8 @@ async def upload_patent(file: UploadFile = File(...)):
         if os.path.exists(file_location):
             os.remove(file_location)
         raise HTTPException(
-            status_code=500, detail=f"Произошла ошибка при обработке PDF: {str(e)}"
+            status_code=500,
+            detail=f"Произошла ошибка при обработке PDF: {str(e)}"
         ) from e
 
 
