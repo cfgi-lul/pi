@@ -1,15 +1,17 @@
 """Module for extracting text from PDF files."""
+from typing import Dict, List, Tuple
+
 import pdfplumber
 
 
-def extract_text_from_pdf(file_path: str) -> tuple[str, dict]:
+def extract_text_from_pdf(file_path: str) -> Tuple[str, Dict]:
     """
     Извлекает текст из PDF-файла по пути.
 
     :param file_path: Путь к PDF файлу
     :return: Кортеж (извлеченный текст, метаданные)
     """
-    extracted_pages: list[str] = []
+    extracted_pages: List[str] = []
     metadata = {}
 
     with pdfplumber.open(file_path) as pdf:
