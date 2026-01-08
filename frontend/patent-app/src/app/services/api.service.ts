@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpEvent, HttpEventType, HttpProgressEvent } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 export interface PatentUploadResponse {
   message: string;
   status: string;
+  extracted_text?: string;
+  metadata?: any;
 }
 
 export interface PatentUploadError {
@@ -19,23 +21,18 @@ export class ApiService {
   private readonly apiUrl = 'http://localhost:8000';
 
   constructor(private http: HttpClient) {}
+
   uploadPatent(file: File): Observable<PatentUploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
     return this.http.post<PatentUploadResponse>(
       `${this.apiUrl}/patent`,
-      formData,
-      {
-        reportProgress: true,
-        observe: 'events'
-      }
+      formData
     ).pipe(
-      map((event: HttpEvent<PatentUploadResponse>) => {
-        if (event.type === HttpEventType.Response) {
-          return event.body!;
-        }
-        throw new Error('Unexpected event type');
+      catchError((error: HttpErrorResponse) => {
+        const errorMessage = error.error?.detail || error.error?.error || error.message || 'Upload failed';
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
