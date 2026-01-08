@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from pdf_text_extractor import extract_text_from_pdf
+from pdf_text_extractor import extract_text_from_pdf, extract_alloy_info_from_text
 
 app = FastAPI(
     title="Patent API",
@@ -55,7 +55,15 @@ async def upload_patent(file: UploadFile = File(...)):
 
     # Извлечение текста из PDF
     try:
+        print(f"[PDF] Начало обработки файла: {file.filename}", flush=True)
         extracted_text, metadata = extract_text_from_pdf(file_location)
+        print(f"[PDF] Текст извлечен. Страниц: {metadata.get('pages', 'N/A')}, Символов: {len(extracted_text)}", flush=True)
+        
+        # Извлечение информации об сплавах из текста патента
+        print("[PDF] Начало извлечения информации об сплавах...", flush=True)
+        alloy_info = extract_alloy_info_from_text(extracted_text)
+        print("[PDF] Извлечение информации об сплавах завершено", flush=True)
+        
         # Удаляем временный файл после обработки
         if os.path.exists(file_location):
             os.remove(file_location)
@@ -63,7 +71,8 @@ async def upload_patent(file: UploadFile = File(...)):
             "message": "Файл патента успешно получен и обработан",
             "status": "processed",
             "extracted_text": extracted_text,
-            "metadata": metadata
+            "metadata": metadata,
+            "alloy_info": alloy_info
         }
     except ValueError as e:
         # Удаляем временный файл при ошибке

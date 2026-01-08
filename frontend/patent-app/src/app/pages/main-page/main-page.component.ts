@@ -36,6 +36,8 @@ export class MainPageComponent {
   readonly uploadProgress = signal<number>(0);
   readonly isUploading = signal<boolean>(false);
   readonly uploadStatus = signal<string>('');
+  readonly alloyInfo = signal<string | null>(null);
+  readonly processingComplete = signal<boolean>(false);
 
   onReject(files: File | readonly File[]): void {
     const rejectedFile = Array.isArray(files) ? files[0] : files;
@@ -53,6 +55,8 @@ export class MainPageComponent {
     this.isUploading.set(true);
     this.uploadProgress.set(0);
     this.uploadStatus.set('Uploading...');
+    this.alloyInfo.set(null);
+    this.processingComplete.set(false);
 
     this.apiService.uploadPatent(file)
       .pipe(
@@ -61,6 +65,8 @@ export class MainPageComponent {
           this.uploadStatus.set(`Error: ${error.error?.error || error.message || 'Upload failed'}`);
           this.isUploading.set(false);
           this.uploadProgress.set(0);
+          this.alloyInfo.set(null);
+          this.processingComplete.set(false);
           return of(null);
         })
       )
@@ -69,7 +75,14 @@ export class MainPageComponent {
           this.uploadStatus.set(result.message || 'Upload successful!');
           this.uploadProgress.set(100);
           this.isUploading.set(false);
-          // Clear the file after successful upload
+          // Сохраняем информацию об сплавах для отображения
+          if (result.alloy_info) {
+            this.alloyInfo.set(result.alloy_info);
+          } else {
+            this.alloyInfo.set(null);
+          }
+          this.processingComplete.set(true);
+          // Clear the file after successful upload (но оставляем alloyInfo для отображения)
           setTimeout(() => {
             this.control.setValue(null);
             this.uploadStatus.set('');

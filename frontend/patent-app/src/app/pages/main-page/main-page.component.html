@@ -41,5 +41,16 @@
     </div>
   }
 
-  
+  @if (alloyInfo(); as info) {
+    <div class="alloy-info-section">
+      <h3>Информация об сплавах</h3>
+      <div class="alloy-text">
+        <pre>{{ info }}</pre>
+      </div>
+    </div>
+  } @else if (processingComplete() && !isUploading() && !alloyInfo()) {
+    <div class="alloy-info-section">
+      <p class="no-data">Информация об сплавах не найдена в документе.</p>
+    </div>
+  }
 </div>
