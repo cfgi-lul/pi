@@ -12,6 +12,7 @@ app = FastAPI(
 )
 
 # Configure CORS to allow requests from Angular frontend
+# Настраивает CORS для разрешения запросов от Angular фронтенда
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4200"],  # Angular default port
@@ -24,6 +25,7 @@ app.add_middleware(
 @app.get("/")
 async def root():
     """Root endpoint that returns a welcome message."""
+    """Возвращает приветственное сообщение для проверки работы API."""
     return {"message": "Hello World"}
 
 
