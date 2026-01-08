@@ -1,41 +1,139 @@
-# FastAPI Backend
+Patent API
+API для обработки и управления патентными документами в формате PDF.
 
-A simple FastAPI application for the Patent Management System.
+📋 Описание
+Patent API — это FastAPI-приложение для загрузки, проверки и извлечения текста из патентных PDF-файлов. Сервис предоставляет RESTful API для интеграции с фронтенд-приложениями (например, Angular).
 
-## Setup
+✨ Основные возможности
+📄 Загрузка PDF-файлов патентов через API
 
-1. Activate the virtual environment:
-```bash
-cd backend
-source .venv/bin/activate
-```
+🔍 Автоматическая проверка формата файлов (сигнатура PDF)
 
-2. Install dependencies:
-```bash
+📝 Извлечение текста из PDF без сохранения на диск
+
+🔒 CORS настройка для безопасной работы с фронтендом
+
+📊 Метаданные обработки файлов
+
+🐛 Обработка ошибок с детальными сообщениями
+
+🚀 Быстрый старт
+Предварительные требования
+Python 3.8+
+
+pip (менеджер пакетов Python)
+
+Установка
+Клонируйте репозиторий:
+
+bash
+git clone <repository-url>
+cd patent-api
+Установите зависимости:
+
+bash
 pip install -r requirements.txt
-```
+Запустите приложение:
 
-## Running the Application
+bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-### Using FastAPI CLI (Recommended)
+📁 Структура проекта
+text
+patent-api/
+├── main.py              # Основной файл FastAPI приложения
+├── utils/
+│   └── pdf_text_extractor.py  # Модуль для извлечения текста из PDF
+├── requirements.txt     # Зависимости Python
+├── README.md           # Эта документация
+└── tests/              # Тесты (рекомендуется добавить)
+🔧 Зависимости
+Основные зависимости указаны в requirements.txt:
 
-Start the development server with auto-reload:
-```bash
-fastapi dev src/main.py
-```
+fastapi>=0.122.0 - Веб-фреймворк
 
-### Alternative: Using Uvicorn directly
+uvicorn[standard]>=0.24.0 - ASGI сервер
 
-```bash
-uvicorn src.main:app --reload --host 0.0.0.0 --port 8000
-```
+pdfplumber - Извлечение текста из PDF
 
-The API will be available at:
-- **API**: http://localhost:8000
-- **Interactive API docs (Swagger)**: http://localhost:8000/docs
-- **Alternative API docs (ReDoc)**: http://localhost:8000/redoc
+pylint>=3.0.0 - Линтинг кода
 
-## Endpoints
+pycodestyle>=2.11.0 - Проверка стиля кода
 
-- `GET /` - Root endpoint (returns "Hello World")
+🌐 API Endpoints
+1. GET /
+Проверка работоспособности API.
+
+Ответ:
+
+json
+{
+  "message": "Hello World"
+}
+2. POST /patent
+Загрузка и обработка PDF-файла патента.
+
+Параметры:
+
+file: PDF файл (multipart/form-data)
+
+Успешный ответ:
+
+json
+{
+  "message": "Файл патента успешно получен и обработан",
+  "status": "processed",
+  "extracted_text": "Извлеченный текст из PDF...",
+  "metadata": {}
+}
+Ошибки:
+
+400: Неверный формат файла
+
+500: Ошибка при обработке PDF
+
+🛠 Использование
+Пример запроса с cURL:
+bash
+curl -X POST "http://localhost:8000/patent" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@path/to/patent.pdf"
+Пример запроса с Python (requests):
+python
+import requests
+
+url = "http://localhost:8000/patent"
+files = {"file": open("patent.pdf", "rb")}
+
+response = requests.post(url, files=files)
+print(response.json())
+Интеграция с Angular:
+typescript
+import { HttpClient } from '@angular/common/http';
+
+uploadPatent(file: File) {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  return this.http.post('http://localhost:8000/patent', formData);
+}
+
+Стиль кода:
+bash
+# Проверка стиля
+pycodestyle --max-line-length=100 main.py utils/
+
+# Линтинг
+pylint main.py utils/
+📄 Лицензия
+[Укажите вашу лицензию]
+
+👥 Контакты
+Автор: [Ваше имя/команда]
+
+Issues: [Ссылка на трекер задач]
+
+Документация: [Дополнительная документация]
+
 
