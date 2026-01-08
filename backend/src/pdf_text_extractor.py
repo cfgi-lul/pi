@@ -1,44 +1,23 @@
-import io
-
+"""Module for extracting text from PDF files."""
 import pdfplumber
-from fastapi import UploadFile
 
 
-def extract_text_from_pdf_file(file: UploadFile) -> str:
+def extract_text_from_pdf(file_path: str) -> tuple[str, dict]:
     """
-    Извлекает текст из PDF-файла, переданного как UploadFile (FastAPI).
+    Извлекает текст из PDF-файла по пути.
 
-    - Не сохраняет файл на диск
-    - Не сохраняет верстку
-    - Возвращает весь текст одной строкой
-    - Подходит для дальнейшего NLP / парсинга
-
-    :param file: UploadFile (FastAPI), PDF файл
-    :return: Текст из PDF в виде строки
+    :param file_path: Путь к PDF файлу
+    :return: Кортеж (извлеченный текст, метаданные)
     """
-
-    # Быстрая проверка типа (дополнительная защита)
-    if file.content_type != "application/pdf":
-        raise ValueError("Переданный файл не является PDF")
-
-    # Читаем файл целиком в память
-    pdf_bytes = file.file.read()
-
-    # Простая проверка сигнатуры PDF
-    if not pdf_bytes.startswith(b"%PDF"):
-        raise ValueError("Файл не похож на PDF (нет сигнатуры %PDF)")
-
     extracted_pages: list[str] = []
+    metadata = {}
 
-    # Открываем PDF из памяти
-    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+    with pdfplumber.open(file_path) as pdf:
+        metadata["pages"] = len(pdf.pages)
         for page in pdf.pages:
-            # pdfplumber сам решает, как извлечь текст
             page_text = page.extract_text()
             if page_text:
                 extracted_pages.append(page_text)
 
-    # Склеиваем страницы в одну строку
     full_text = "\n\n".join(extracted_pages).strip()
-
-    return full_text
+    return full_text, metadata

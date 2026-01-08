@@ -1,7 +1,10 @@
 """Patent API module for patent management and processing."""
-from fastapi import FastAPI, File, UploadFile
+import os
+
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from utils.pdf_text_extractor import extract_text_from_pdf, is_pdf_file
+
+from pdf_text_extractor import extract_text_from_pdf
 
 app = FastAPI(
     title="Patent API",
@@ -25,7 +28,6 @@ app.add_middleware(
 @app.get("/")
 async def root():
     """Root endpoint that returns a welcome message."""
-    """Возвращает приветственное сообщение для проверки работы API."""
     return {"message": "Hello World"}
 
 
@@ -42,21 +44,41 @@ async def upload_patent(file: UploadFile = File(...)):
     """
     # Сохранение загруженного файла временно
     file_location = f"/tmp/{file.filename}"
-    with open(file_location, "wb") as f:
-        f.write(await file.read())
-
-    # Проверка, является ли файл PDF
-    if not is_pdf_file(file_location):
-        return {"error": "Неверный PDF файл"}
+    try:
+        with open(file_location, "wb") as f:
+            content = await file.read()
+            f.write(content)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Ошибка при сохранении файла: {str(e)}"
+        ) from e
 
     # Извлечение текста из PDF
     try:
         extracted_text, metadata = extract_text_from_pdf(file_location)
+        # Удаляем временный файл после обработки
+        if os.path.exists(file_location):
+            os.remove(file_location)
         return {
             "message": "Файл патента успешно получен и обработан",
             "status": "processed",
             "extracted_text": extracted_text,
             "metadata": metadata
         }
+    except ValueError as e:
+        # Удаляем временный файл при ошибке
+        if os.path.exists(file_location):
+            os.remove(file_location)
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        return {"error": f"Произошла ошибка при обработке PDF: {str(e)}"}
+        # Удаляем временный файл при ошибке
+        if os.path.exists(file_location):
+            os.remove(file_location)
+        raise HTTPException(
+            status_code=500, detail=f"Произошла ошибка при обработке PDF: {str(e)}"
+        ) from e
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
