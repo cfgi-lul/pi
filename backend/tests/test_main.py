@@ -1,14 +1,13 @@
 import os 
 import sys
-# Добавляем путь к src для импорта модулей
+# Добавляем путь к backend для импорта модулей из пакета src
 backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-src_path = os.path.join(backend_path, "src")
-sys.path.insert(0, src_path)
+sys.path.insert(0, backend_path)
 
 import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
-from main import app 
+from src.main import app 
 
 client = TestClient(app)
 
@@ -45,8 +44,8 @@ def test_upload_patent_valid_pdf(create_temp_pdf):
     mock_metadata = {"pages": 5}
     mock_alloy_info = "Alloy composition: Fe 70%, Cr 20%, Ni 10%"
     
-    with patch('main.extract_text_from_pdf', return_value=(mock_extracted_text, mock_metadata)), \
-         patch('main.extract_alloy_info_from_text', return_value=mock_alloy_info):
+    with patch('src.main.extract_text_from_pdf', return_value=(mock_extracted_text, mock_metadata)), \
+         patch('src.main.extract_alloy_info_from_text', return_value=mock_alloy_info):
         with open(create_temp_pdf, "rb") as f:
             response = client.post("/patent", files={"file": ("test.pdf", f, "application/pdf")})
 
@@ -62,7 +61,7 @@ def test_upload_patent_valid_pdf(create_temp_pdf):
 def test_upload_patent_invalid_file(create_temp_text_file):
     """Тестирование загрузки некорректного файла (текстового)."""
     # Мокируем extract_text_from_pdf чтобы он выбрасывал ValueError для невалидного файла
-    with patch('main.extract_text_from_pdf', side_effect=ValueError("неверный формат файла")):
+    with patch('src.main.extract_text_from_pdf', side_effect=ValueError("неверный формат файла")):
         with open(create_temp_text_file, "rb") as f:
             response = client.post("/patent", files={"file": ("test.txt", f, "text/plain")})
 
