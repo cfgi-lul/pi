@@ -8,6 +8,7 @@ export interface PatentUploadResponse {
   status: string;
   extracted_text?: string;
   metadata?: any;
+  alloy_info?: string;
 }
 
 export interface PatentUploadError {

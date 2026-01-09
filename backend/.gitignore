@@ -68,4 +68,4 @@ logs/
 *.temp
 *.swp
 *.swo
-
+*.gguf
