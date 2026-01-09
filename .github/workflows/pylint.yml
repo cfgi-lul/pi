@@ -1,4 +1,4 @@
-name: Pylint
+name: Code Quality and Tests
 
 on:
   push:
@@ -9,15 +9,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.10"
     - name: Install dependencies
       working-directory: ./backend
       run: |
@@ -34,3 +31,7 @@ jobs:
       run: |
         shopt -s globstar nullglob
         pycodestyle src/**/*.py
+    - name: Running tests with pytest
+      working-directory: ./backend
+      run: |
+        python -m pytest tests/ -v

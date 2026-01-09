@@ -4,7 +4,10 @@ import os
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from pdf_text_extractor import extract_text_from_pdf, extract_alloy_info_from_text
+from pdf_text_extractor import (  # pylint: disable=import-error
+    extract_text_from_pdf,
+    extract_alloy_info_from_text
+)
 
 app = FastAPI(
     title="Patent API",
@@ -48,7 +51,7 @@ async def upload_patent(file: UploadFile = File(...)):
         with open(file_location, "wb") as f:
             content = await file.read()
             f.write(content)
-    except Exception as e:
+    except (IOError, OSError) as e:
         raise HTTPException(
             status_code=500, detail=f"Ошибка при сохранении файла: {str(e)}"
         ) from e
@@ -57,13 +60,15 @@ async def upload_patent(file: UploadFile = File(...)):
     try:
         print(f"[PDF] Начало обработки файла: {file.filename}", flush=True)
         extracted_text, metadata = extract_text_from_pdf(file_location)
-        print(f"[PDF] Текст извлечен. Страниц: {metadata.get('pages', 'N/A')}, Символов: {len(extracted_text)}", flush=True)
-        
+        pages = metadata.get('pages', 'N/A')
+        chars = len(extracted_text)
+        print(f"[PDF] Текст извлечен. Страниц: {pages}, "
+              f"Символов: {chars}", flush=True)
+
         # Извлечение информации об сплавах из текста патента
         print("[PDF] Начало извлечения информации об сплавах...", flush=True)
         alloy_info = extract_alloy_info_from_text(extracted_text)
         print("[PDF] Извлечение информации об сплавах завершено", flush=True)
-        
         # Удаляем временный файл после обработки
         if os.path.exists(file_location):
             os.remove(file_location)
@@ -79,7 +84,7 @@ async def upload_patent(file: UploadFile = File(...)):
         if os.path.exists(file_location):
             os.remove(file_location)
         raise HTTPException(status_code=400, detail=str(e)) from e
-    except Exception as e:
+    except (FileNotFoundError, OSError) as e:
         # Удаляем временный файл при ошибке
         if os.path.exists(file_location):
             os.remove(file_location)

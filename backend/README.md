@@ -178,6 +178,62 @@ uploadPatent(file: File) {
 }
 ```
 
+## Тестирование
+
+Проект использует `pytest` для тестирования. Убедитесь, что `pytest` установлен:
+
+```bash
+pip install -r requirements.txt
+```
+
+### Способы запуска тестов:
+
+**1. Запустить все тесты:**
+```bash
+cd backend
+python3 -m pytest tests/
+```
+
+или просто:
+```bash
+python3 -m pytest tests/
+```
+
+**2. Запустить тесты с подробным выводом:**
+```bash
+python3 -m pytest tests/ -v
+```
+
+**3. Запустить конкретный файл с тестами:**
+```bash
+python3 -m pytest tests/test_main.py
+python3 -m pytest tests/test_pdf_extractor.py
+```
+
+**4. Запустить конкретный тест:**
+```bash
+python3 -m pytest tests/test_main.py::test_root
+```
+
+**5. Запустить тесты с выводом print-ов:**
+```bash
+python3 -m pytest tests/ -v -s
+```
+
+**6. Запустить тесты и показать покрытие (требуется pytest-cov):**
+```bash
+pip install pytest-cov
+python3 -m pytest tests/ --cov=src --cov-report=html
+```
+
+### Структура тестов:
+
+```
+tests/
+├── test_main.py              # Тесты для FastAPI endpoints
+└── test_pdf_extractor.py     # Тесты для извлечения текста из PDF
+```
+
 ## Стиль кода
 
 ```bash

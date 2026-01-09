@@ -1,9 +1,13 @@
 import os 
 import sys
-sys.path.insert(0, "C:/Users/Win10/pi/backend/src")
+# Добавляем путь к src для импорта модулей
+backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+src_path = os.path.join(backend_path, "src")
+sys.path.insert(0, src_path)
+
 import pytest
 from unittest.mock import patch, MagicMock
-from src.pdf_text_extractor import extract_text_from_pdf
+from pdf_text_extractor import extract_text_from_pdf
 
 def test_extract_text_from_pdf():
     # Создаем поддельный объект PDF
@@ -13,9 +17,13 @@ def test_extract_text_from_pdf():
     # Задаем поведение для поддельной страницы
     mock_page.extract_text.return_value = "Sample text from page 1"
     mock_pdf.pages = [mock_page]  # Список страниц
+    
+    # Настраиваем mock_pdf как контекстный менеджер
+    mock_pdf.__enter__ = MagicMock(return_value=mock_pdf)
+    mock_pdf.__exit__ = MagicMock(return_value=False)
 
     # Настраиваем mock для pdfplumber.open
-    with patch('pdfplumber.open', return_value=mock_pdf):
+    with patch('pdf_text_extractor.pdfplumber.open', return_value=mock_pdf):
         file_path = 'test.pdf'  # Путь к тестовому PDF (можно указать любой строковый путь)
 
         # Вызываем функцию
