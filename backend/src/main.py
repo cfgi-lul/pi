@@ -4,7 +4,7 @@ import os
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from pdf_text_extractor import (  # pylint: disable=import-error
+from .pdf_text_extractor import (
     extract_text_from_pdf,
     extract_alloy_info_from_text
 )
